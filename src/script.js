@@ -5,6 +5,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import firefliesVertexShader from './shaders/fireflies/vertex.glsl'
 import firefliesFragmentShader from './shaders/fireflies/fragment.glsl'
+import portalVertexShader from './shaders/fireflies/vertex.glsl'
+import portalFragmentShader from './shaders/fireflies/fragment.glsl'
 
 /**
  * Base
@@ -52,7 +54,10 @@ const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 const poleLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffe5 })
 
 // Portal light material
-const portalLightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+const portalLightMaterial = new THREE.ShaderMaterial({
+    vertexShader: portalVertexShader,
+    fragmentShader: portalFragmentShader
+})
 
 /**
  * Model
@@ -100,6 +105,7 @@ firefliesGeometry.setAttribute('aScale', new THREE.BufferAttribute(scaleArray, 1
 const firefliesMaterial = new THREE.ShaderMaterial({
     uniforms:
     {
+        uTime: { value: 0 },
         uPixelRatio: { value: Math.min(window.devicePixelRatio, 2)},
         uSize: { value: 100 }
     },
@@ -183,6 +189,9 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update Material
+    firefliesMaterial.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
